@@ -1,0 +1,35 @@
+@baseUrl = http://localhost:5000
+
+### 1. Get all products
+GET {{baseUrl}}/api/products
+Accept: application/json
+
+### 2. Get a product by Id
+GET {{baseUrl}}/api/products/1
+Accept: application/json
+
+### 3. Create a product
+POST {{baseUrl}}/api/products
+Content-Type: application/json
+
+{
+  "name": "Metal Ruler 30cm",
+  "description": "Stainless steel ruler graduated in mm and inches",
+  "price": 45.00,
+  "stock": 25
+}
+
+### 4. Update a product
+PUT {{baseUrl}}/api/products/1
+Content-Type: application/json
+
+{
+  "name": "Updated Professional Notebook",
+  "description": "Large grid notebook, 100 sheets, hardcover",
+  "price": 42.50,
+  "stock": 45
+}
+
+### 5. Delete a product
+DELETE {{baseUrl}}/api/products/4
+Accept: application/json
