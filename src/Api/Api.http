@@ -1,0 +1,4 @@
+@Api_HostAddress = {{$processEnv ASPNETCORE_URLS}}
+
+GET {{Api_HostAddress}}/weatherforecast/
+Accept: application/json
