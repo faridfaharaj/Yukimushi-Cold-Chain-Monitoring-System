@@ -1,5 +1,6 @@
 using Api;
 using Data;
+using Mqtt;
 using Readings;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<DbConnectionFactory>();
 builder.Services.AddScoped<IReadingRepository, ReadingRepository>();
 builder.Services.AddScoped<IReadingService, ReadingService>();
+
+builder.Services.AddMqtt(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
