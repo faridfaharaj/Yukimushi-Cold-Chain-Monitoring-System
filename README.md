@@ -24,7 +24,14 @@ cd Yukimushi-Cold-Chain-Monitoring-System
 ```bash
 # change theese to your actual paths
 export ASPNETCORE_URLS="https://localhost:5000"
-export ConnectionStrings__DefaultConnection="Server=127.0.0.1,1433;Database=Yukimushi;Trusted_Connection=True;TrustServerCertificate=True;"
+export Mqtt__Host="broker.hivemq.com"
+export Mqtt__Port="1833"
+export Mqtt__ClientId="Yukimushi-CCMS-App"
+
+# if aplicable:
+export Mqtt__UseTls="true"
+export Mqtt__Username="username"
+export Mqtt__Password="password"
 
 ```
 
@@ -33,7 +40,6 @@ export ConnectionStrings__DefaultConnection="Server=127.0.0.1,1433;Database=Yuki
 ```bash
 # change theese to your actual paths
 $env:ASPNETCORE_URLS = "https://localhost:5000"
-$env:ConnectionStrings__DefaultConnection = "Server=127.0.0.1,1433;Database=Yukimushi;Trusted_Connection=True;TrustServerCertificate=True;"
 
 ```
 
