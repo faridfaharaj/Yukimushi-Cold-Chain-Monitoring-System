@@ -12,11 +12,11 @@ public class ReadingsApi : ControllerBase
 {
     private const int MIN_ID = 1;
 
-    private readonly IReadingService _productService;
+    private readonly IReadingService _readingService;
 
-    public ReadingsApi(IReadingService productService)
+    public ReadingsApi(IReadingService readingService)
     {
-        _productService = productService;
+        _readingService = readingService;
     }
 
     [HttpGet]
@@ -24,8 +24,8 @@ public class ReadingsApi : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        var products = await _productService.getAllAsync(cancellationToken);
-        return Ok(products.Select(toResponse));
+        var readings = await _readingService.getAllAsync(cancellationToken);
+        return Ok(readings.Select(toResponse));
     }
 
     [HttpGet("{id:int}")]
@@ -34,13 +34,13 @@ public class ReadingsApi : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        var product = await _productService.getByIdAsync(id, cancellationToken);
-        if (product == null)
+        var reading = await _readingService.getByIdAsync(id, cancellationToken);
+        if (reading == null)
         {
             return NotFound();
         }
 
-        return Ok(toResponse(product));
+        return Ok(toResponse(reading));
     }
 
     [HttpPost]
@@ -49,7 +49,7 @@ public class ReadingsApi : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        int newId = await _productService.createAsync(toEntity(request), cancellationToken);
+        int newId = await _readingService.createAsync(toEntity(request), cancellationToken);
 
         return CreatedAtAction(nameof(getById), new { id = newId }, null);
     }
@@ -60,7 +60,7 @@ public class ReadingsApi : ControllerBase
         CancellationToken cancellationToken
     )
     {
-        bool deleted = await _productService.deleteAsync(id, cancellationToken);
+        bool deleted = await _readingService.deleteAsync(id, cancellationToken);
         if (!deleted)
         {
             return NotFound();
@@ -74,8 +74,8 @@ public class ReadingsApi : ControllerBase
         return new Reading { value = request.Value };
     }
 
-    private static ReadingResponse toResponse(Reading product)
+    private static ReadingResponse toResponse(Reading reading)
     {
-        return new ReadingResponse { Value = product.value, CreatedAt = product.timeStamp };
+        return new ReadingResponse { Value = reading.value, CreatedAt = reading.timeStamp };
     }
 }

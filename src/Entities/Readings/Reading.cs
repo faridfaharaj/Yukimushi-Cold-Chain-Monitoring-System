@@ -1,6 +1,6 @@
 namespace Entities;
 
-public class Reading
+public abstract class Reading
 {
     public int id { get; set; }
 
