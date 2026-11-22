@@ -1,26 +1,36 @@
 using System.Buffers.Binary;
 using Microsoft.Extensions.Logging;
+using Readings;
+using Entities;
 
 namespace Mqtt.Handlers;
 
 public sealed class TopicHumidityHandler : TopicReading
 {
-    private readonly ILogger<TopicHumidityHandler> _logger;
-
-    public TopicHumidityHandler(ILogger<TopicHumidityHandler> logger)
-        : base(logger) => _logger = logger;
+    public TopicHumidityHandler(ILogger<TopicCoverHandler> logger, IReadingService readingService)
+        : base(logger, readingService) { }
 
     public override string Key => "TopicHumidity";
 
     protected override Task HandleReadingAsync(
         string device,
+        string kind,
         DateTime timeStamp,
         ReadOnlySpan<byte> rest,
         CancellationToken ct
     )
     {
         var value = BinaryPrimitives.ReadSingleLittleEndian(rest);
-        //handle
-        return Task.CompletedTask;
+        
+        return _readingService.createFloatAsync(
+            new FloatReading
+            {
+                device = device,
+                kind = kind,
+                timeStamp = timeStamp,
+                value = value,
+            },
+            ct
+        );
     }
 }

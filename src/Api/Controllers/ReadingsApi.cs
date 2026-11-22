@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using Api.Dtos;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
 using Readings;
@@ -19,41 +18,6 @@ public class ReadingsApi : ControllerBase
         _readingService = readingService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<ReadingResponse>>> getAll(
-        CancellationToken cancellationToken
-    )
-    {
-        var readings = await _readingService.getAllAsync(cancellationToken);
-        return Ok(readings.Select(toResponse));
-    }
-
-    [HttpGet("{id:int}")]
-    public async Task<ActionResult<ReadingResponse>> getById(
-        [Range(MIN_ID, int.MaxValue)] int id,
-        CancellationToken cancellationToken
-    )
-    {
-        var reading = await _readingService.getByIdAsync(id, cancellationToken);
-        if (reading == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(toResponse(reading));
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> create(
-        ReadingRequest request,
-        CancellationToken cancellationToken
-    )
-    {
-        int newId = await _readingService.createAsync(toEntity(request), cancellationToken);
-
-        return CreatedAtAction(nameof(getById), new { id = newId }, null);
-    }
-
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> delete(
         [Range(MIN_ID, int.MaxValue)] int id,
@@ -69,13 +33,25 @@ public class ReadingsApi : ControllerBase
         return NoContent();
     }
 
-    private static Reading toEntity(ReadingRequest request)
+    [HttpGet("readings/{device}/{start:datetime}/{end:datetime}")]
+    public async Task<ActionResult<IEnumerable<Reading>>> getRangeDevice(
+        string device,
+        DateTime start,
+        DateTime end,
+        CancellationToken cancellationToken
+    )
     {
-        return new Reading { value = request.Value };
-    }
+        if (start > end)
+        {
+            return BadRequest("start must be earlier than or equal to end.");
+        }
 
-    private static ReadingResponse toResponse(Reading reading)
-    {
-        return new ReadingResponse { Value = reading.value, CreatedAt = reading.timeStamp };
+        var readings = await _readingService.getByDateRangeAsync(
+            device,
+            start,
+            end,
+            cancellationToken
+        );
+        return Ok(readings);
     }
 }

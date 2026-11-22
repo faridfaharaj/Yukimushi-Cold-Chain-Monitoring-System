@@ -13,4 +13,11 @@ public interface IReadingRepository
     Task<int> createTriggerAsync(TriggerReading reading, CancellationToken cancellationToken);
 
     Task<int> createBooleanAsync(BooleanReading reading, CancellationToken cancellationToken);
+
+    Task<IEnumerable<Reading>> getByDateRangeAsync(
+        string device,
+        DateTime from,
+        DateTime to,
+        CancellationToken cancellationToken
+    );
 }

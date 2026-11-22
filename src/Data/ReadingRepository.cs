@@ -44,15 +44,21 @@ public class ReadingRepository : IReadingRepository
             CommandType = CommandType.StoredProcedure,
         };
 
-        /*
-        addReadingParameters(command, reading);
-        */
+        command.Parameters.Add(new SqlParameter("@Device", SqlDbType.NVarChar) { Value = reading.device });
+        command.Parameters.Add(new SqlParameter("@TakenAt", SqlDbType.NVarChar) { Value = reading.timeStamp });
+        command.Parameters.Add(new SqlParameter("@Kind", SqlDbType.NVarChar) { Value = reading.kind });
+        
+        command.Parameters.Add(new SqlParameter("@Longitude", SqlDbType.NVarChar) { Value = reading.longitude });
+        command.Parameters.Add(new SqlParameter("@Latitude", SqlDbType.NVarChar) { Value = reading.latitude });
 
         var result = await command.ExecuteScalarAsync(cancellationToken);
         return Convert.ToInt32(result);
     }
 
-    public async Task<int> createFloatAsync(Reading reading, CancellationToken cancellationToken)
+    public async Task<int> createFloatAsync(
+        FloatReading reading,
+        CancellationToken cancellationToken
+    )
     {
         await using var connection = _connectionFactory.createConnection();
         await connection.OpenAsync(cancellationToken);
@@ -62,15 +68,20 @@ public class ReadingRepository : IReadingRepository
             CommandType = CommandType.StoredProcedure,
         };
 
-        /*
-        addReadingParameters(command, reading);
-        */
+        command.Parameters.Add(new SqlParameter("@Device", SqlDbType.NVarChar) { Value = reading.device });
+        command.Parameters.Add(new SqlParameter("@TakenAt", SqlDbType.NVarChar) { Value = reading.timeStamp });
+        command.Parameters.Add(new SqlParameter("@Kind", SqlDbType.NVarChar) { Value = reading.kind });
+        
+        command.Parameters.Add(new SqlParameter("@Value", SqlDbType.NVarChar) { Value = reading.value });
 
         var result = await command.ExecuteScalarAsync(cancellationToken);
         return Convert.ToInt32(result);
     }
 
-    public async Task<int> createTriggerAsync(Reading reading, CancellationToken cancellationToken)
+    public async Task<int> createTriggerAsync(
+        TriggerReading reading,
+        CancellationToken cancellationToken
+    )
     {
         await using var connection = _connectionFactory.createConnection();
         await connection.OpenAsync(cancellationToken);
@@ -80,15 +91,18 @@ public class ReadingRepository : IReadingRepository
             CommandType = CommandType.StoredProcedure,
         };
 
-        /*
-        addReadingParameters(command, reading);
-        */
+        command.Parameters.Add(new SqlParameter("@Device", SqlDbType.NVarChar) { Value = reading.device });
+        command.Parameters.Add(new SqlParameter("@TakenAt", SqlDbType.NVarChar) { Value = reading.timeStamp });
+        command.Parameters.Add(new SqlParameter("@Kind", SqlDbType.NVarChar) { Value = reading.kind });
 
         var result = await command.ExecuteScalarAsync(cancellationToken);
         return Convert.ToInt32(result);
     }
 
-    public async Task<int> createBooleanAsync(Reading reading, CancellationToken cancellationToken)
+    public async Task<int> createBooleanAsync(
+        BooleanReading reading,
+        CancellationToken cancellationToken
+    )
     {
         await using var connection = _connectionFactory.createConnection();
         await connection.OpenAsync(cancellationToken);
@@ -98,9 +112,11 @@ public class ReadingRepository : IReadingRepository
             CommandType = CommandType.StoredProcedure,
         };
 
-        /*
-        addReadingParameters(command, reading);
-        */
+        command.Parameters.Add(new SqlParameter("@Device", SqlDbType.NVarChar) { Value = reading.device });
+        command.Parameters.Add(new SqlParameter("@TakenAt", SqlDbType.NVarChar) { Value = reading.timeStamp });
+        command.Parameters.Add(new SqlParameter("@Kind", SqlDbType.NVarChar) { Value = reading.kind });
+        
+        command.Parameters.Add(new SqlParameter("@State", SqlDbType.NVarChar) { Value = reading.state });
 
         var result = await command.ExecuteScalarAsync(cancellationToken);
         return Convert.ToInt32(result);
@@ -138,6 +154,37 @@ public class ReadingRepository : IReadingRepository
     }
     */
 
+    private static Reading mapReading(SqlDataReader reader)
+    {
+        Reading reading;
+
+        if (hasValue(reader, "Value"))
+        {
+            reading = mapFloatReading(reader);
+        }
+        else if (hasValue(reader, "State"))
+        {
+            reading = mapBooleanReading(reader);
+        }
+        else if (hasValue(reader, "Longitude"))
+        {
+            reading = mapGeospatialReading(reader);
+        }
+        else
+        {
+            reading = mapTriggerReading(reader);
+        }
+
+        reading.device = reader.GetString(reader.GetOrdinal("Device"));
+
+        return reading;
+    }
+
+    private static bool hasValue(SqlDataReader reader, string column)
+    {
+        return !reader.IsDBNull(reader.GetOrdinal(column));
+    }
+
     private static Reading mapBooleanReading(SqlDataReader reader)
     {
         int descriptionOrdinal = reader.GetOrdinal("Description");
@@ -145,6 +192,8 @@ public class ReadingRepository : IReadingRepository
         return new BooleanReading
         {
             id = reader.GetInt32(reader.GetOrdinal("Id")),
+            device = reader.GetString(reader.GetOrdinal("Device")),
+            kind = reader.GetString(reader.GetOrdinal("Kind")),
             timeStamp = reader.GetDateTime(reader.GetOrdinal("TimeStamp")),
             state = reader.GetBoolean(reader.GetOrdinal("State")),
         };
@@ -157,6 +206,8 @@ public class ReadingRepository : IReadingRepository
         return new TriggerReading
         {
             id = reader.GetInt32(reader.GetOrdinal("Id")),
+            device = reader.GetString(reader.GetOrdinal("Device")),
+            kind = reader.GetString(reader.GetOrdinal("Kind")),
             timeStamp = reader.GetDateTime(reader.GetOrdinal("TimeStamp")),
         };
     }
@@ -168,6 +219,8 @@ public class ReadingRepository : IReadingRepository
         return new FloatReading
         {
             id = reader.GetInt32(reader.GetOrdinal("Id")),
+            device = reader.GetString(reader.GetOrdinal("Device")),
+            kind = reader.GetString(reader.GetOrdinal("Kind")),
             timeStamp = reader.GetDateTime(reader.GetOrdinal("TimeStamp")),
             value = reader.GetFloat(reader.GetOrdinal("Value")),
         };
@@ -180,9 +233,42 @@ public class ReadingRepository : IReadingRepository
         return new GeospatialReading
         {
             id = reader.GetInt32(reader.GetOrdinal("Id")),
+            device = reader.GetString(reader.GetOrdinal("Device")),
+            kind = reader.GetString(reader.GetOrdinal("Kind")),
             timeStamp = reader.GetDateTime(reader.GetOrdinal("TimeStamp")),
             longitude = reader.GetDouble(reader.GetOrdinal("Longitude")),
             latitude = reader.GetFloat(reader.GetOrdinal("Latitude")),
         };
+    }
+
+    public async Task<IEnumerable<Reading>> getByDateRangeAsync(
+        string device,
+        DateTime from,
+        DateTime to,
+        CancellationToken cancellationToken
+    )
+    {
+        var readings = new List<Reading>();
+
+        await using var connection = _connectionFactory.createConnection();
+        await connection.OpenAsync(cancellationToken);
+
+        await using var command = new SqlCommand(GET_BY_DATE_RANGE_PROCEDURE, connection)
+        {
+            CommandType = CommandType.StoredProcedure,
+        };
+
+        command.Parameters.Add(new SqlParameter("@Device", SqlDbType.NVarChar) { Value = device });
+        command.Parameters.Add(new SqlParameter("@From", SqlDbType.DateTime2) { Value = from });
+        command.Parameters.Add(new SqlParameter("@To", SqlDbType.DateTime2) { Value = to });
+
+        await using var reader = await command.ExecuteReaderAsync(cancellationToken);
+
+        while (await reader.ReadAsync(cancellationToken))
+        {
+            readings.Add(mapReading(reader));
+        }
+
+        return readings;
     }
 }

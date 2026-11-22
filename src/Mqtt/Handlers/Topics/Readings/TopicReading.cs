@@ -1,19 +1,26 @@
 using System.Buffers.Binary;
 using Microsoft.Extensions.Logging;
 using Mqtt.Contracts;
+using Readings;
 
 namespace Mqtt.Handlers;
 
 public abstract class TopicReading : ITopicHandler
 {
-    private readonly ILogger _logger;
+    protected readonly ILogger _logger;
+    protected readonly IReadingService _readingService;
 
-    protected TopicReading(ILogger logger) => _logger = logger;
+    protected TopicReading(ILogger logger, IReadingService readingService)
+    {
+        _logger = logger;
+        _readingService = readingService;
+    }
 
     public abstract string Key { get; }
 
     protected abstract Task HandleReadingAsync(
         string device,
+        string kind,
         DateTime timestamp,
         ReadOnlySpan<byte> bytes,
         CancellationToken ct
@@ -33,6 +40,6 @@ public abstract class TopicReading : ITopicHandler
         var timestamp = DateTimeOffset.FromUnixTimeSeconds((long)raw).UtcDateTime;
         var rest = message.Payload.AsSpan(sizeof(ulong));
 
-        return HandleReadingAsync(device, timestamp, rest, ct);
+        return HandleReadingAsync(device, Key, timestamp, rest, ct);
     }
 }

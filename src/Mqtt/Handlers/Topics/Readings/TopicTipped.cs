@@ -1,24 +1,32 @@
+using Entities;
 using Microsoft.Extensions.Logging;
+using Readings;
 
 namespace Mqtt.Handlers;
 
 public sealed class TopicTippedHandler : TopicReading
 {
-    private readonly ILogger<TopicTippedHandler> _logger;
-
-    public TopicTippedHandler(ILogger<TopicTippedHandler> logger)
-        : base(logger) => _logger = logger;
+    public TopicTippedHandler(ILogger<TopicCoverHandler> logger, IReadingService readingService)
+        : base(logger, readingService) { }
 
     public override string Key => "TopicTipped";
 
     protected override Task HandleReadingAsync(
         string device,
+        string kind,
         DateTime timeStamp,
         ReadOnlySpan<byte> rest,
         CancellationToken ct
     )
     {
-        //handle
-        return Task.CompletedTask;
+        return _readingService.createTriggerAsync(
+            new TriggerReading
+            {
+                device = device,
+                kind = kind,
+                timeStamp = timeStamp,
+            },
+            ct
+        );
     }
 }
