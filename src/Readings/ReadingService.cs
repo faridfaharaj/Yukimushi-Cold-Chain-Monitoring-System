@@ -58,12 +58,13 @@ public class ReadingService : IReadingService
     }
 
     public async Task<IEnumerable<Reading>> getByDateRangeAsync(
-        string device,
         DateTime from,
         DateTime to,
+        string? device,
+        string? group,
         CancellationToken cancellationToken
     )
     {
-        return await _repository.getByDateRangeAsync(device, from, to, cancellationToken);
+        return await _repository.getByDateRangeAsync(from, to, device, group, cancellationToken);
     }
 }

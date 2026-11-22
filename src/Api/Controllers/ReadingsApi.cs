@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Readings;
 
 namespace Api.Controllers;
@@ -33,11 +34,12 @@ public class ReadingsApi : ControllerBase
         return NoContent();
     }
 
-    [HttpGet("readings/{device}/{start:datetime}/{end:datetime}")]
-    public async Task<ActionResult<IEnumerable<Reading>>> getRangeDevice(
-        string device,
-        DateTime start,
-        DateTime end,
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<Reading>>> GetByRange(
+        [FromQuery, BindRequired] DateTime start,
+        [FromQuery, BindRequired] DateTime end,
+        [FromQuery] string? device,
+        [FromQuery] string? group,
         CancellationToken cancellationToken
     )
     {
@@ -47,9 +49,10 @@ public class ReadingsApi : ControllerBase
         }
 
         var readings = await _readingService.getByDateRangeAsync(
-            device,
             start,
             end,
+            device,
+            group,
             cancellationToken
         );
         return Ok(readings);

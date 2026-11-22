@@ -44,12 +44,22 @@ public class ReadingRepository : IReadingRepository
             CommandType = CommandType.StoredProcedure,
         };
 
-        command.Parameters.Add(new SqlParameter("@Device", SqlDbType.NVarChar) { Value = reading.device });
-        command.Parameters.Add(new SqlParameter("@TakenAt", SqlDbType.NVarChar) { Value = reading.timeStamp });
-        command.Parameters.Add(new SqlParameter("@Kind", SqlDbType.NVarChar) { Value = reading.kind });
-        
-        command.Parameters.Add(new SqlParameter("@Longitude", SqlDbType.NVarChar) { Value = reading.longitude });
-        command.Parameters.Add(new SqlParameter("@Latitude", SqlDbType.NVarChar) { Value = reading.latitude });
+        command.Parameters.Add(
+            new SqlParameter("@Device", SqlDbType.NVarChar) { Value = reading.device }
+        );
+        command.Parameters.Add(
+            new SqlParameter("@TakenAt", SqlDbType.NVarChar) { Value = reading.timeStamp }
+        );
+        command.Parameters.Add(
+            new SqlParameter("@Kind", SqlDbType.NVarChar) { Value = reading.kind }
+        );
+
+        command.Parameters.Add(
+            new SqlParameter("@Longitude", SqlDbType.NVarChar) { Value = reading.longitude }
+        );
+        command.Parameters.Add(
+            new SqlParameter("@Latitude", SqlDbType.NVarChar) { Value = reading.latitude }
+        );
 
         var result = await command.ExecuteScalarAsync(cancellationToken);
         return Convert.ToInt32(result);
@@ -68,11 +78,19 @@ public class ReadingRepository : IReadingRepository
             CommandType = CommandType.StoredProcedure,
         };
 
-        command.Parameters.Add(new SqlParameter("@Device", SqlDbType.NVarChar) { Value = reading.device });
-        command.Parameters.Add(new SqlParameter("@TakenAt", SqlDbType.NVarChar) { Value = reading.timeStamp });
-        command.Parameters.Add(new SqlParameter("@Kind", SqlDbType.NVarChar) { Value = reading.kind });
-        
-        command.Parameters.Add(new SqlParameter("@Value", SqlDbType.NVarChar) { Value = reading.value });
+        command.Parameters.Add(
+            new SqlParameter("@Device", SqlDbType.NVarChar) { Value = reading.device }
+        );
+        command.Parameters.Add(
+            new SqlParameter("@TakenAt", SqlDbType.NVarChar) { Value = reading.timeStamp }
+        );
+        command.Parameters.Add(
+            new SqlParameter("@Kind", SqlDbType.NVarChar) { Value = reading.kind }
+        );
+
+        command.Parameters.Add(
+            new SqlParameter("@Value", SqlDbType.NVarChar) { Value = reading.value }
+        );
 
         var result = await command.ExecuteScalarAsync(cancellationToken);
         return Convert.ToInt32(result);
@@ -91,9 +109,15 @@ public class ReadingRepository : IReadingRepository
             CommandType = CommandType.StoredProcedure,
         };
 
-        command.Parameters.Add(new SqlParameter("@Device", SqlDbType.NVarChar) { Value = reading.device });
-        command.Parameters.Add(new SqlParameter("@TakenAt", SqlDbType.NVarChar) { Value = reading.timeStamp });
-        command.Parameters.Add(new SqlParameter("@Kind", SqlDbType.NVarChar) { Value = reading.kind });
+        command.Parameters.Add(
+            new SqlParameter("@Device", SqlDbType.NVarChar) { Value = reading.device }
+        );
+        command.Parameters.Add(
+            new SqlParameter("@TakenAt", SqlDbType.NVarChar) { Value = reading.timeStamp }
+        );
+        command.Parameters.Add(
+            new SqlParameter("@Kind", SqlDbType.NVarChar) { Value = reading.kind }
+        );
 
         var result = await command.ExecuteScalarAsync(cancellationToken);
         return Convert.ToInt32(result);
@@ -112,11 +136,19 @@ public class ReadingRepository : IReadingRepository
             CommandType = CommandType.StoredProcedure,
         };
 
-        command.Parameters.Add(new SqlParameter("@Device", SqlDbType.NVarChar) { Value = reading.device });
-        command.Parameters.Add(new SqlParameter("@TakenAt", SqlDbType.NVarChar) { Value = reading.timeStamp });
-        command.Parameters.Add(new SqlParameter("@Kind", SqlDbType.NVarChar) { Value = reading.kind });
-        
-        command.Parameters.Add(new SqlParameter("@State", SqlDbType.NVarChar) { Value = reading.state });
+        command.Parameters.Add(
+            new SqlParameter("@Device", SqlDbType.NVarChar) { Value = reading.device }
+        );
+        command.Parameters.Add(
+            new SqlParameter("@TakenAt", SqlDbType.NVarChar) { Value = reading.timeStamp }
+        );
+        command.Parameters.Add(
+            new SqlParameter("@Kind", SqlDbType.NVarChar) { Value = reading.kind }
+        );
+
+        command.Parameters.Add(
+            new SqlParameter("@State", SqlDbType.NVarChar) { Value = reading.state }
+        );
 
         var result = await command.ExecuteScalarAsync(cancellationToken);
         return Convert.ToInt32(result);
@@ -242,9 +274,10 @@ public class ReadingRepository : IReadingRepository
     }
 
     public async Task<IEnumerable<Reading>> getByDateRangeAsync(
-        string device,
         DateTime from,
         DateTime to,
+        string? device,
+        string? group,
         CancellationToken cancellationToken
     )
     {
@@ -258,9 +291,20 @@ public class ReadingRepository : IReadingRepository
             CommandType = CommandType.StoredProcedure,
         };
 
-        command.Parameters.Add(new SqlParameter("@Device", SqlDbType.NVarChar) { Value = device });
         command.Parameters.Add(new SqlParameter("@From", SqlDbType.DateTime2) { Value = from });
         command.Parameters.Add(new SqlParameter("@To", SqlDbType.DateTime2) { Value = to });
+        command.Parameters.Add(
+            new SqlParameter("@Device", SqlDbType.NVarChar)
+            {
+                Value = string.IsNullOrWhiteSpace(device) ? DBNull.Value : device,
+            }
+        );
+        command.Parameters.Add(
+            new SqlParameter("@Group", SqlDbType.NVarChar)
+            {
+                Value = string.IsNullOrWhiteSpace(group) ? DBNull.Value : group,
+            }
+        );
 
         await using var reader = await command.ExecuteReaderAsync(cancellationToken);
 

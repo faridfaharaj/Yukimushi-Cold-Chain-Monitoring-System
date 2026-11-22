@@ -14,9 +14,10 @@ public interface IReadingService
     Task<bool> deleteAsync(int id, CancellationToken cancellationToken);
 
     Task<IEnumerable<Reading>> getByDateRangeAsync(
-        string device,
         DateTime from,
         DateTime to,
+        string? device,
+        string? group,
         CancellationToken cancellationToken
     );
 }
