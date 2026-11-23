@@ -20,7 +20,12 @@ public static class DependencyInjection
         services.AddSingleton(sp => sp.GetRequiredService<IOptions<MqttOptions>>().Value);
 
         services.TryAddSingleton<IMqttMessageHandler, MessageDispatcher>();
+        services.AddScoped<ITopicHandler, TopicCoverHandler>();
+        services.AddScoped<ITopicHandler, TopicHumidityHandler>();
+        services.AddScoped<ITopicHandler, TopicLightHandler>();
+        services.AddScoped<ITopicHandler, TopicShockHandler>();
         services.AddScoped<ITopicHandler, TopicTemperatureHandler>();
+        services.AddScoped<ITopicHandler, TopicTippedHandler>();
 
         services.AddSingleton<MqttClientService>();
         services.AddSingleton<IMqttClientService>(sp => sp.GetRequiredService<MqttClientService>());

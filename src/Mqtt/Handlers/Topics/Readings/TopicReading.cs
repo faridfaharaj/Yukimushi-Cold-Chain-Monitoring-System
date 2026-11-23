@@ -29,16 +29,16 @@ public abstract class TopicReading : ITopicHandler
     public Task HandleAsync(MqttMessage message, CancellationToken ct)
     {
         var parts = message.Topic.Split('/');
-        if (parts.Length < 2 || message.Payload.Length < sizeof(ulong))
+        if (parts.Length < 2 || message.Payload.Length < sizeof(uint))
         {
             _logger.LogWarning("got bad message from {Topic}", message.Topic);
             return Task.CompletedTask;
         }
 
         var device = parts[^2];
-        var raw = BinaryPrimitives.ReadUInt64LittleEndian(message.Payload);
-        var timestamp = DateTimeOffset.FromUnixTimeSeconds((long)raw).UtcDateTime;
-        var rest = message.Payload.AsSpan(sizeof(ulong));
+        var raw = BinaryPrimitives.ReadUInt32LittleEndian(message.Payload);
+        var timestamp = DateTimeOffset.FromUnixTimeSeconds(raw).UtcDateTime;
+        var rest = message.Payload.AsSpan(sizeof(uint));
 
         return HandleReadingAsync(device, Key, timestamp, rest, ct);
     }

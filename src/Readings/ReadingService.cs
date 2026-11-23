@@ -38,6 +38,10 @@ public class ReadingService : IReadingService
         CancellationToken cancellationToken
     )
     {
+        if (float.IsNaN(reading.value) || float.IsInfinity(reading.value))
+        {
+            return 0;
+        }
         return await _repository.createFloatAsync(reading, cancellationToken);
     }
 
