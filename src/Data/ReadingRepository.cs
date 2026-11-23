@@ -504,8 +504,6 @@ public class ReadingRepository : IReadingRepository
 
     private static Reading mapBooleanReading(SqlDataReader reader)
     {
-        int descriptionOrdinal = reader.GetOrdinal("Description");
-
         return new BooleanReading
         {
             id = reader.GetInt32(reader.GetOrdinal("Id")),
@@ -518,8 +516,6 @@ public class ReadingRepository : IReadingRepository
 
     private static Reading mapTriggerReading(SqlDataReader reader)
     {
-        int descriptionOrdinal = reader.GetOrdinal("Description");
-
         return new TriggerReading
         {
             id = reader.GetInt32(reader.GetOrdinal("Id")),
@@ -531,8 +527,6 @@ public class ReadingRepository : IReadingRepository
 
     private static Reading mapFloatReading(SqlDataReader reader)
     {
-        int descriptionOrdinal = reader.GetOrdinal("Description");
-
         return new FloatReading
         {
             id = reader.GetInt32(reader.GetOrdinal("Id")),
@@ -545,8 +539,6 @@ public class ReadingRepository : IReadingRepository
 
     private static Reading mapGeospatialReading(SqlDataReader reader)
     {
-        int descriptionOrdinal = reader.GetOrdinal("Description");
-
         return new GeospatialReading
         {
             id = reader.GetInt32(reader.GetOrdinal("Id")),
