@@ -11,7 +11,6 @@ CREATE TABLE dbo.device_group (
 CREATE TABLE dbo.device (
     id       INT IDENTITY(1,1) PRIMARY KEY,
     group_id INT NOT NULL,
-    kind_id  INT NOT NULL,
     mac      VARCHAR(40) NOT NULL UNIQUE,
     nombre   VARCHAR(40) NOT NULL,
     CONSTRAINT FK_device_group FOREIGN KEY (group_id) REFERENCES dbo.device_group(id),
